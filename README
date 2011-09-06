@@ -1,6 +1,9 @@
 When using Multi Site in WordPress pinging remote services are disabled by default. I needed 
 something that would ping remote services at least once per hour. This is the result.
 
+Licensed under European Union Public License (EUPL) version 1.1 that can be found 
+at http://ec.europa.eu/idabc/eupl 
+
 1. Copy config.template.php to config.php and fill in your database name, username, password and host.
 2. Run the script from command line.
 3. or make an entry in crontab that runs the script once a hour.
