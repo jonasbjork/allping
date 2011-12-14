@@ -1,13 +1,20 @@
 <?php
 require ('config.php');
 
-function tbl_to_id($tbl) {
+function tbl_to_id($tbl=null) {
+	if ( $tbl === null )
+	{
+		return false;
+	}
 	preg_match('/wp_(.*)_posts/', $tbl, $b);
 	return $b[1];
 }
 
-function get_blog_name($id) {
-
+function get_blog_name($id=null) {
+	if ( $id === null )
+	{
+		return false;
+	}
 	$info = array();
 	$sql = sprintf("SELECT option_name, option_value FROM wp_%d_options WHERE option_name='siteurl' OR option_name='blogname';", $id);
 	$query = mysql_query($sql);
@@ -24,8 +31,11 @@ function get_blog_name($id) {
 	return $info;
 }
 
-function ping_it($data, $site) {
-	
+function ping_it($data=null, $site=null) {
+	if ( $data === null  || $site === null )
+	{
+		return false;
+	}
 	printf("Pinging: %s\n", $site);
 	$s = parse_url($site);
 	$path = rtrim(@$s['path'], '/');
@@ -48,7 +58,11 @@ function ping_it($data, $site) {
 	//print $contents.PHP_EOL;
 }
 
-function get_ping_xml($tbl) {
+function get_ping_xml($tbl=null) {
+	if ( $tbl === null )
+	{
+		return false;
+	}
 	$id = tbl_to_id($tbl);
 	$blog = get_blog_name($id);
 	$blogtitle = $blog['blogname'];
@@ -67,7 +81,11 @@ function get_ping_xml($tbl) {
 	return $xml;
 
 }
-function get_new_posts($tbl, $ping_services) {
+function get_new_posts($tbl=null, $ping_services=null) {
+	if ( $tbl === null || $ping_services === null )
+	{
+		return false;
+	}
 	// mysql> SELECT ID FROM wp_98_posts WHERE post_date > DATE_SUB(now(), INTERVAL 1 HOUR) AND post_status='publish';
 	$posts = array();
 	//print "==> table: ".$tbl.PHP_EOL;
@@ -85,13 +103,13 @@ function get_new_posts($tbl, $ping_services) {
 	return $posts;
 }
 
-foreach ($wp_instances as $wpi) {
+foreach ($wp_instances as $wp_instance) {
 
-	print "==> ".$wpi['db_name'].PHP_EOL;
-	print $wpi['db_name'].":".$wpi['db_user'].":".$wpi['db_pass'].":".$wpi['db_host'].PHP_EOL;
-	//printf("%s-%s-%s-%s\n", $wpi['db_name'], $wpi['db_user'], $wpi['db_pass'], $wpi['db_host']);
-	$db = mysql_connect($wpi['db_host'], $wpi['db_user'], $wpi['db_pass']);
-	mysql_select_db($wpi['db_name'], $db);
+	print "==> ".$wp_instance['db_name'].PHP_EOL;
+	print $wp_instance['db_name'].":".$wp_instance['db_user'].":".$wp_instance['db_pass'].":".$wp_instance['db_host'].PHP_EOL;
+	//printf("%s-%s-%s-%s\n", $wp_instance['db_name'], $wp_instance['db_user'], $wp_instance['db_pass'], $wp_instance['db_host']);
+	$db = mysql_connect($wp_instance['db_host'], $wp_instance['db_user'], $wp_instance['db_pass']);
+	mysql_select_db($wp_instance['db_name'], $db);
 	$tbl = mysql_query("SHOW TABLES LIKE 'wp%_posts'", $db);
 	if (mysql_num_rows($tbl) > 0) {
 		while ($r = mysql_fetch_array($tbl)) {
